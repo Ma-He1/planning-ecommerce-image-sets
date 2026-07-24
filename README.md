@@ -168,7 +168,8 @@ python .\planning-ecommerce-image-sets\scripts\validate_plan.py `
 - 自动化回归测试：100 项通过
 - 外部生图 API：未接入
 - 实际出图路线：Codex 内置 `imagegen`
+- GitHub 可见性：Public
 
 ## 许可
 
-当前仓库按私有项目发布，暂未附加开源许可证。未获得仓库所有者许可前，不代表允许公开复制、修改或再分发。
+当前仓库已公开展示，但暂未附加开源许可证。公开可见不等于授予复制、修改、商用或再分发权限；如需使用，请先获得仓库所有者许可。
