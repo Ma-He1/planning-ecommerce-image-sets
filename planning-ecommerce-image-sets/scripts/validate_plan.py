@@ -46,6 +46,7 @@ ALLOWED_ACTIONS = {
 ALLOWED_ROLES = {
     "hero_kv",
     "main_white",
+    "editorial_cover",
     "selling_points",
     "specification",
     "feature_detail",
@@ -60,13 +61,9 @@ ALLOWED_RATIOS = {"1:1", "3:4", "4:5", "9:16", "4:3", "16:9"}
 ALLOWED_TEXT_MODES = {"none", "direct", "post_layout"}
 ALLOWED_OVERALL_STATUSES = {"ready", "partially_ready", "blocked"}
 ALLOWED_BLOCKING_SCOPES = {"module", "whole_product"}
-ALLOWED_PLAN_VERSIONS = {"1.0", "2.0"}
-DEFAULT_PORTFOLIO_CONTRACT = {
-    "platform_type": "portfolio",
-    "platform_name": "国内通用电商作品集",
-    "decision_source": "default",
-    "aspect_ratio": "9:16",
-}
+ALLOWED_DECISION_SOURCES = {"explicit", "inferred", "default"}
+ALLOWED_CONFIDENCE_LEVELS = {"high", "medium", "low"}
+ALLOWED_FIRST_IMAGE_RULES = {"main_white", "hero_kv", "editorial_cover", "custom"}
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ISO_DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T")
 CHINESE_RE = re.compile(r"[\u3400-\u9fff]")
@@ -172,9 +169,8 @@ def validate(plan):
     for field in sorted(REQUIRED_TOP_LEVEL - set(plan)):
         errors.append(f"missing required field: {field}")
 
-    version = plan.get("version")
-    if version not in ALLOWED_PLAN_VERSIONS:
-        errors.append(f"version is invalid: {version!r}")
+    if plan.get("version") != "2.0":
+        errors.append("version must be '2.0'")
 
     platform = require_dict(plan.get("platform_decision"), "platform_decision", errors)
     language = require_dict(plan.get("language_decision"), "language_decision", errors)
@@ -201,9 +197,22 @@ def validate(plan):
     platform_ratio = platform.get("aspect_ratio")
     if platform_ratio not in ALLOWED_RATIOS:
         errors.append(f"platform_decision.aspect_ratio is invalid: {platform_ratio!r}")
-    for field in ("platform_name", "decision_source", "confidence", "first_image_rule"):
-        if not platform.get(field):
-            errors.append(f"platform_decision.{field} is required")
+    require_non_empty_string(
+        platform.get("platform_name"), "platform_decision.platform_name", errors
+    )
+    decision_source = platform.get("decision_source")
+    if decision_source not in ALLOWED_DECISION_SOURCES:
+        errors.append(
+            f"platform_decision.decision_source is invalid: {decision_source!r}"
+        )
+    confidence = platform.get("confidence")
+    if confidence not in ALLOWED_CONFIDENCE_LEVELS:
+        errors.append(f"platform_decision.confidence is invalid: {confidence!r}")
+    first_image_rule = platform.get("first_image_rule")
+    if first_image_rule not in ALLOWED_FIRST_IMAGE_RULES:
+        errors.append(
+            f"platform_decision.first_image_rule is invalid: {first_image_rule!r}"
+        )
 
     rule_checked_at = platform.get("rule_checked_at")
     if require_non_empty_string(
@@ -233,21 +242,10 @@ def validate(plan):
         for field in ("title", "url", "source_type"):
             require_non_empty_string(source.get(field), f"{source_path}.{field}", errors)
 
-    if (
-        platform.get("decision_source") == "default"
-        or platform.get("platform_name") == DEFAULT_PORTFOLIO_CONTRACT["platform_name"]
-    ):
-        mismatches = [
-            field
-            for field, expected in DEFAULT_PORTFOLIO_CONTRACT.items()
-            if platform.get(field) != expected
-        ]
-        if mismatches:
-            errors.append(
-                "default portfolio contract requires platform_type=portfolio, "
-                "platform_name='国内通用电商作品集', decision_source=default, "
-                f"aspect_ratio=9:16; mismatched: {', '.join(mismatches)}"
-            )
+    if decision_source == "default" and platform_type != "portfolio":
+        errors.append(
+            "default platform decisions must use platform_type=portfolio"
+        )
 
     if language.get("planning_language") != "zh-CN":
         errors.append("language_decision.planning_language must be zh-CN")
@@ -387,7 +385,7 @@ def validate(plan):
 
     deferred = require_list(plan.get("deferred_modules"), "deferred_modules", errors)
     deferred_ids = []
-    effective_blocking_scopes = []
+    blocking_scopes = []
     for index, module in enumerate(deferred):
         item = require_dict(module, f"deferred_modules[{index}]", errors)
         module_id = item.get("module_id")
@@ -405,29 +403,37 @@ def validate(plan):
             errors.append(f"deferred_modules[{index}].required_inputs must not be empty")
         blocking_scope = item.get("blocking_scope")
         if blocking_scope is None:
-            if version == "1.0" and overall_status != "blocked":
-                effective_blocking_scopes.append("module")
-            else:
-                errors.append(
-                    f"deferred_modules[{index}].blocking_scope is required for version 2.0"
-                )
+            errors.append(f"deferred_modules[{index}].blocking_scope is required")
         elif blocking_scope not in ALLOWED_BLOCKING_SCOPES:
             errors.append(
                 f"deferred_modules[{index}].blocking_scope is invalid: {blocking_scope!r}"
             )
         else:
-            effective_blocking_scopes.append(blocking_scope)
+            blocking_scopes.append(blocking_scope)
     overlap = set(deferred_ids) & set(ready_now)
     if overlap:
         errors.append(f"deferred_modules must not appear in ready_now: {sorted(overlap)}")
 
-    has_module_blocker = "module" in effective_blocking_scopes
-    has_whole_product_blocker = "whole_product" in effective_blocking_scopes
+    has_module_blocker = "module" in blocking_scopes
+    has_whole_product_blocker = "whole_product" in blocking_scopes
     if has_whole_product_blocker and shots:
         errors.append(
             "whole_product deferred modules cannot coexist with executable shots"
         )
-    if overall_status == "partially_ready":
+    if overall_status == "ready":
+        if (
+            not isinstance(count, int)
+            or isinstance(count, bool)
+            or count < 1
+            or not shots
+            or not ready_now
+        ):
+            errors.append(
+                "ready plan requires a positive executable subset in shots and ready_now"
+            )
+        if deferred:
+            errors.append("ready plan cannot contain deferred_modules")
+    elif overall_status == "partially_ready":
         if (
             not isinstance(count, int)
             or isinstance(count, bool)
@@ -459,18 +465,17 @@ def validate(plan):
                 "module-scoped or missing-scope deferrals cannot block the whole product"
             )
 
-    if platform_type == "amazon" and shots:
+    if shots:
         first = shots[0] if isinstance(shots[0], dict) else {}
         first_text = first.get("text_strategy", {})
-        if (
-            first.get("role") != "main_white"
-            or first.get("aspect_ratio") != "1:1"
-            or first_text.get("mode") != "none"
-            or first_text.get("exact_copy")
-        ):
+        if first_image_rule != "custom" and first.get("role") != first_image_rule:
             errors.append(
-                "Amazon first shot must be a 1:1 main_white image with no overlay copy"
+                "first shot role must match platform_decision.first_image_rule"
             )
+        if first_image_rule == "main_white" and (
+            first_text.get("mode") != "none" or first_text.get("exact_copy")
+        ):
+            errors.append("main_white first shot must not contain overlay copy")
 
     return errors
 
