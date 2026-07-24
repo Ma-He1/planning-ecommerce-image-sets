@@ -1,0 +1,170 @@
+{
+  "version": "2.0",
+  "overall_status": "partially_ready",
+  "platform_decision": {
+    "platform_type": "portfolio",
+    "platform_name": "国内通用电商作品集",
+    "decision_source": "default",
+    "confidence": "medium",
+    "first_image_rule": "hero_kv",
+    "aspect_ratio": "9:16",
+    "rule_checked_at": "2026-07-22",
+    "hard_rules": [
+      "包装原文必须保持参考图原样",
+      "同一套图统一使用 9:16 画幅"
+    ],
+    "creative_guidance": [
+      "主 KV 建立品牌记忆，其余页面分别回答一个买家问题",
+      "使用暖白、香槟金与深灰建立克制高端的套图节奏"
+    ],
+    "rule_sources": [
+      {
+        "title": "平台与语言判断规则：品牌官网与作品集",
+        "url": "skill://planning-ecommerce-image-sets/references/platform-language-rules.md#品牌官网与作品集",
+        "source_type": "skill_local"
+      }
+    ]
+  },
+  "language_decision": {
+    "planning_language": "zh-CN",
+    "prompt_language": "zh-CN",
+    "overlay_language": "zh-CN",
+    "packaging_text_policy": "preserve_original"
+  },
+  "input_assessment": {
+    "identity_reference_usable": true,
+    "visible_views": ["香槟金耳机与开盖充电盒正面"],
+    "limitations": ["没有耳机背面、盒体底部、充电接口和佩戴侧面参考"]
+  },
+  "facts": {
+    "visible_facts": ["香槟金真无线耳机", "充电盒处于正面开盖状态", "产品外形圆润简洁"],
+    "user_confirmed_facts": ["目标场景为都市通勤", "希望表现更专注的聆听体验"],
+    "official_confirmed_facts": [],
+    "uncertain_observations": ["表面可能为金属质感涂层，但无法从照片确认材质"],
+    "missing_critical_info": ["降噪等级", "续航", "充电接口", "尺寸与重量"],
+    "creative_assumptions": ["使用暖白、香槟金与深灰建立克制高端视觉"]
+  },
+  "buyer_questions": ["这是什么产品？", "产品外观有什么记忆点？", "通勤时能带来什么体验？", "收纳和取用是否方便？"],
+  "visual_system": {
+    "brand_mood": "克制、安静、都市高端",
+    "color_palette": ["香槟金", "暖白", "炭灰"],
+    "typography": "现代几何无衬线中文，标题紧凑，说明文字留足行距"
+  },
+  "recommended_image_count": 4,
+  "count_reason": "一张身份主视觉、一张白底外观、一张通勤价值和一张取用场景分别回答四个不同问题；参数与接口因缺少证据暂缓。",
+  "shots": [
+    {
+      "image_id": "01_hero_kv",
+      "role": "hero_kv",
+      "priority": "required",
+      "execution_action": "reference_generate",
+      "reference_risk": "low",
+      "content_message": "建立香槟金耳机克制高端的第一印象。",
+      "buyer_question_answered": "这是什么产品？",
+      "aspect_ratio": "9:16",
+      "reference_inputs": [
+        {
+          "path": "D:/user-supplied/earbuds-front-open-case.png",
+          "purpose": "商品身份、正面开盒角度、香槟金颜色与可见结构依据"
+        }
+      ],
+      "generation_prompt": "以原始参考图中的香槟金真无线耳机和正面开盖充电盒为唯一产品依据，严格保留外形、颜色、部件数量与开合角度。生成九比十六品牌主视觉，产品组合放在画面右侧中下部，占画面约四成，暖白到炭灰渐变空间配合一束柔和轮廓光，形成安静而有力量的视觉焦点。左上预留简洁标题安全区，除包装原文外不要生成任何新增文字，后期排版加入“静享此刻”。不得补画底部接口、按钮、未知纹理或额外配件。",
+      "text_strategy": {
+        "mode": "post_layout",
+        "exact_copy": ["静享此刻"],
+        "overlay_language": "zh-CN"
+      },
+      "negative_constraints": ["不改变商品颜色、结构和开盒角度", "不生成未知接口和额外配件", "底图不生成新增文字"],
+      "qa_checks": ["产品与原始参考图身份一致", "标题安全区不压住商品", "画面只有一个主视觉焦点"]
+    },
+    {
+      "image_id": "02_main_white",
+      "role": "main_white",
+      "priority": "required",
+      "execution_action": "clean_up",
+      "reference_risk": "low",
+      "content_message": "清楚展示耳机与充电盒的真实外观。",
+      "buyer_question_answered": "产品外观有什么记忆点？",
+      "aspect_ratio": "9:16",
+      "reference_inputs": [
+        {
+          "path": "D:/user-supplied/earbuds-front-open-case.png",
+          "purpose": "精确抠图、真实裁切、商品比例与正面外观依据"
+        }
+      ],
+      "generation_prompt": "基于原始产品照片进行精确抠图与清洁，不重新设计商品。九比十六纯暖白背景，香槟金耳机与正面开盖充电盒保持参考图中的相对位置和正面角度，整体居中，占画面高度约六成，保留自然柔和的落地阴影以表现体积。画面不加入道具、人物、装饰图形、边框、水印和任何新增文字，只保留商品原有可见标识。不得改变耳机数量、盒盖比例、颜色和表面结构，不补画参考图未显示的背面与底部。",
+      "text_strategy": {
+        "mode": "none",
+        "exact_copy": [],
+        "overlay_language": "zh-CN"
+      },
+      "negative_constraints": ["不重新造型", "不增加道具和文字", "不显示未知背面与底部"],
+      "qa_checks": ["抠图边缘干净", "商品比例和颜色准确", "背景统一且没有伪文字"]
+    },
+    {
+      "image_id": "03_commute_focus",
+      "role": "usage_scene",
+      "priority": "required",
+      "execution_action": "scene_composite",
+      "reference_risk": "medium",
+      "content_message": "用都市通勤环境表现更专注的聆听体验。",
+      "buyer_question_answered": "通勤时能带来什么体验？",
+      "aspect_ratio": "9:16",
+      "reference_inputs": [
+        {
+          "path": "D:/user-supplied/earbuds-front-open-case.png",
+          "purpose": "场景合成时的前景商品身份、颜色与可见正面结构依据"
+        }
+      ],
+      "generation_prompt": "生成九比十六早高峰地铁车厢场景，一位都市青年自然站立并安静聆听，背景通勤人群和灯带有轻微动感虚化，人物面部与身体周围保持克制清晰的安静区域，以视觉对比表达专注，不使用夸张隔绝罩或声波特效。画面下方前景预留位置，后续合成原始参考图中的香槟金耳机与开盖充电盒；左上留标题安全区，底图不生成新增文字，后期加入“通勤，也能静下来”。不得宣称降噪等级，不补画产品未知佩戴侧面。",
+      "text_strategy": {
+        "mode": "post_layout",
+        "exact_copy": ["通勤，也能静下来"],
+        "overlay_language": "zh-CN"
+      },
+      "negative_constraints": ["不使用夸张隔音罩", "不写降噪数值", "不让模型重绘未知佩戴视角"],
+      "qa_checks": ["场景动作与通勤用途一致", "安静效果克制", "合成后的产品身份准确"]
+    },
+    {
+      "image_id": "04_take_and_go",
+      "role": "usage_scene",
+      "priority": "recommended",
+      "execution_action": "scene_composite",
+      "reference_risk": "medium",
+      "content_message": "通过出门前取用动作表现收纳与携带价值。",
+      "buyer_question_answered": "收纳和取用是否方便？",
+      "aspect_ratio": "9:16",
+      "reference_inputs": [
+        {
+          "path": "D:/user-supplied/earbuds-front-open-case.png",
+          "purpose": "取用场景合成中的充电盒身份、正面开合角度与外形依据"
+        }
+      ],
+      "generation_prompt": "生成九比十六都市住宅玄关近景，一只自然比例的手从整洁随身包旁取起开盖充电盒，动作明确但不过度遮挡，背景仅保留钥匙、卡包和柔和晨光，证明出门前快速取用的使用价值。产品区域使用原始香槟金开盖充电盒照片精确合成，保持正面开合角度和外形，不让生成模型臆造手掌中的背面结构。画面右上预留短标题安全区，除产品原文外不生成文字，后期加入“随手收纳 即刻出发”。",
+      "text_strategy": {
+        "mode": "post_layout",
+        "exact_copy": ["随手收纳 即刻出发"],
+        "overlay_language": "zh-CN"
+      },
+      "negative_constraints": ["不改变产品尺寸和开合结构", "不出现畸形手指", "不增加无关电子产品"],
+      "qa_checks": ["手部动作自然", "产品未被手遮住关键外观", "道具共同证明出门取用场景"]
+    }
+  ],
+  "deferred_modules": [
+    {
+      "module_id": "specification",
+      "why_deferred": "缺少官方续航、尺寸、重量和降噪参数。",
+      "required_inputs": ["官方参数表或商品详情链接"],
+      "blocking_scope": "module"
+    },
+    {
+      "module_id": "charging_port_detail",
+      "why_deferred": "参考图没有显示充电盒底部和接口。",
+      "required_inputs": ["充电盒接口清晰照片"],
+      "blocking_scope": "module"
+    }
+  ],
+  "ready_now": ["01_hero_kv", "02_main_white", "03_commute_focus", "04_take_and_go"],
+  "needs_more_info": ["官方参数表或商品详情链接", "充电盒接口清晰照片"],
+  "overall_risks": ["单张正面参考图不足以支持佩戴侧面、盒体背面和接口特写", "通勤专注只能作为场景表达，不能升级为已验证的降噪性能"]
+}
