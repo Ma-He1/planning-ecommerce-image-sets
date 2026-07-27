@@ -16,6 +16,7 @@
 - 输出中文生成提示词与可机检 JSON
 - 检查商品身份、结构、文字、事实和平台合同
 - 对失败页面提供重试、合成、后期排版或补资料路线
+- 保存相对路径、SHA256、逐次尝试、耗时与 QA 的可审计交付记录
 
 ## 设计原则
 
@@ -53,11 +54,20 @@
 
 ## 输出
 
+- `brief.json` 与 `inputs/`：确认后的任务和原始参考
 - `content_plan.md`：事实边界、平台判断、视觉系统和逐图意图
 - `image_set_plan.json`：可机检的完整计划
 - `prompts.md`：逐图中文提示词、准确文案和负面约束
+- `run_manifest.json`：模式、文件哈希、逐次尝试、耗时与汇总指标
 - `outputs/`：用户要求生成时的图片
-- `qa_report.md`：逐图状态、问题、修复和待补资料
+- `qa_report.json`：生成模式的结构化逐图 QA
+- `contact_sheet.jpg`：生成模式的整套联系表
+
+纯策划使用 `planning_only`，不得登记生成输出；成图使用 `generation`，必须保存最终图片、结构化 QA 与联系表。完整字段和示例见 `references/delivery-record-contract.md`。
+
+生成交付还必须逐次记录实际提示词、参考输入、原始结果及其 SHA256，并由具名复核者完成身份、事实、平台、文字与构图检查。`brief.json`、`content_plan.md`、`qa_report.json` 和 `contact_sheet.jpg` 都必须在 manifest 中有可校验的证据记录；总体和每张计划图片全部通过才算完整。
+
+Amazon `main_white` 另有机器复核：QA 必须保存结构化 `platform_evidence`，验证器使用 Pillow 读取最终图，重算最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例与主体高度占比。人工填写 `platform: "pass"` 不能替代像素证据。
 
 ## 安装到 Codex
 
@@ -101,11 +111,13 @@ $planning-ecommerce-image-sets
     ├── agents/
     │   └── openai.yaml
     ├── references/
+    │   ├── delivery-record-contract.md
     │   ├── planning-contract.md
     │   ├── platform-language-rules.md
     │   ├── prompt-generation-routing.md
     │   └── qa-and-recovery.md
     └── scripts/
+        ├── validate_delivery.py
         └── validate_plan.py
 ```
 
@@ -113,7 +125,10 @@ $planning-ecommerce-image-sets
 
 ```powershell
 python .\planning-ecommerce-image-sets\scripts\validate_plan.py <plan.json>
+python .\planning-ecommerce-image-sets\scripts\validate_delivery.py <run-dir>
 ```
+
+只有两条命令都以退出码 0 完成，才能把该目录作为已验证交付。
 
 ## 使用边界
 

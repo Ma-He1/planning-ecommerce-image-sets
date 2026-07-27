@@ -87,7 +87,7 @@ description: Use when a user provides product photos or a short product brief an
 
 ### 7. 输出并验证计划
 
-读取 [规划输出合同](references/planning-contract.md)，输出可读中文摘要和严格 JSON。将 `<SKILL_DIR>` 替换为本 Skill 目录后运行：
+读取 [规划输出合同](references/planning-contract.md) 与 [交付记录合同](references/delivery-record-contract.md)，输出可读中文摘要和严格 JSON。生成前先保存 `brief.json`、`inputs/`、`content_plan.md`、`image_set_plan.json` 与 `prompts.md`，再初始化含这些证据路径与 SHA256 的 `run_manifest.json`。将 `<SKILL_DIR>` 替换为本 Skill 目录后运行：
 
 ```powershell
 python <SKILL_DIR>/scripts/validate_plan.py <plan.json>
@@ -99,15 +99,29 @@ python <SKILL_DIR>/scripts/validate_plan.py <plan.json>
 
 按照 `execution_action` 使用 Codex 内置 `imagegen` 生成或编辑。编辑商品图时始终附带原始产品参考；上一张生成图不能成为后续页面唯一的身份依据。
 
-每完成一张就读取 [质量检查与失败恢复](references/qa-and-recovery.md)，按 `qa_checks` 验收。商品身份、结构、事实或平台合同错误属于致命失败；文字与参数优先转确定性排版修复。
+每次生成尝试结束后立即更新 `run_manifest.json`：保存尝试序号、起止时间、耗时、`imagegen` 路由、实际提示词及其 SHA256、引用输入路径与 SHA256、状态和成功尝试的原始结果路径与 SHA256。每完成一张就读取 [质量检查与失败恢复](references/qa-and-recovery.md)，按 `qa_checks` 验收；在结构化 `qa_report.json` 中记录复核时间、复核者、身份/事实/平台/文字/构图检查、问题与恢复动作。商品身份、结构、事实或平台合同错误属于致命失败；文字与参数优先转确定性排版修复。
+
+Amazon 计划中的 `main_white` 不得只凭人工 QA 判定通过。按 [交付记录合同](references/delivery-record-contract.md) 写入结构化 `platform_evidence`；让 `validate_delivery.py` 使用 Pillow 重算最终图的最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例和主体高度占比。缺证据或重算不达标时先修图，再更新 QA 哈希。
+
+生成结束后保存 `outputs/` 与 `contact_sheet.jpg`，把 `qa_report.json` 和联系表路径与 SHA256 写入 manifest。只有总体和每个计划图片均通过 QA 才是完整生成交付；再运行：
+
+```powershell
+python <SKILL_DIR>/scripts/validate_plan.py <run-root>/image_set_plan.json
+python <SKILL_DIR>/scripts/validate_delivery.py <run-root>
+```
+
+任一验证失败时不得声称完成。生成路线始终只有 Codex 内置 `imagegen`。
 
 ## 默认交付物
 
+- `brief.json` 与 `inputs/`：确认后的任务和原始参考
 - `content_plan.md`：平台、事实边界、视觉系统和逐图意图
 - `image_set_plan.json`：可机检计划
 - `prompts.md`：逐图中文提示词、图内准确文案和负面约束
+- `run_manifest.json`：模式、路径、SHA256、逐次尝试、耗时和汇总指标
 - `outputs/`：用户要求生成时的图片
-- `qa_report.md`：逐图状态、问题、修复和待补资料
+- `qa_report.json`：生成模式的结构化逐图 QA
+- `contact_sheet.jpg`：生成模式的整套联系表
 
 ## 暂停条件
 
