@@ -147,18 +147,22 @@
     "corner_sample_ratio": 0.1,
     "corner_strict_white_ratio": 1.0,
     "overall_strict_white_ratio": 0.530547265625,
-    "product_fill_height_ratio": 0.89875
+    "product_fill_longest_axis_ratio": 0.8984375,
+    "foreground_area_ratio": 0.225
   }
 }
 ```
 
 `validate_delivery.py` 使用 Pillow 直接读取接受的最终图并重算，不信任人工填写的 `platform: "pass"`：
 
-- 最长边至少为 1000 px，且 `longest_side_px` 与图片尺寸一致。
+- 最长边必须在 500 至 10000 px，且 `longest_side_px` 与图片尺寸一致。1000 px 以上是支持缩放的生产建议，不是 500 px 接受底线的替代说法。
 - 从四角分别截取宽、高各 10% 的矩形；像素只有在 RGB 三通道均为 255 时才算严格白色。`corner_strict_white_ratio` 记录四块中的最低比例，并且不得低于 0.99。
 - `overall_strict_white_ratio` 记录整张图严格 RGB 255 像素占比。
-- 前景像素定义为任一 RGB 通道低于 245；其非空包围盒高度除以画布高度得到 `product_fill_height_ratio`，必须位于 0.85 至 1.0。
-- `corner_sample_ratio` 固定为 0.1；全部记录值与重算值的允许误差为 `1e-6`。缺字段、灰白角落、分辨率不足、主体高度不足或伪造比例都会使验证失败。
+- 前景像素定义为任一 RGB 通道低于 245；`foreground_area_ratio` 记录前景像素占整图比例，必须至少为 0.02，用于拒绝只靠细线或极少像素撑开边界的明显伪证据。
+- 前景掩码按最长边最多 256 px 缩小，并只保留单元占用率至少 50% 的稳定前景；在这个抗细线代理上计算包围盒宽度/画布宽度与高度/画布高度，取较大值作为 `product_fill_longest_axis_ratio`，必须位于 0.85 至 1.0。这样横向和竖向商品使用同一原则。
+
+四角白色比例、`foreground_area_ratio` 和 `product_fill_longest_axis_ratio` 是本 Skill 的保守型像素代理，只用于发现明显非白底、主体过小、细线撑边或证据值伪造。它不是语义分割，不能识别商品类别，也不能证明 Amazon 人工审核或所有类目例外均已满足；阴影、透明、空心、极浅色、细长商品或异常背景都可能产生误报。保留原始像素证据并增加人工复核，发布前仍需核对目标类目的当前风格指南。
+- `corner_sample_ratio` 固定为 0.1；全部记录值与重算值的允许误差为 `1e-6`。缺字段、灰白角落、最长边小于 500 或大于 10000、前景面积不足、主体最长轴占比不足或伪造比例都会使验证失败。
 
 修改 `qa_report.json` 后必须同步更新 manifest 的 QA SHA256。
 

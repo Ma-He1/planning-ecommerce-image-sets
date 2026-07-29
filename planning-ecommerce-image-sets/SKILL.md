@@ -13,7 +13,7 @@ description: Use when a user provides product photos or a short product brief an
 2. 原始产品照片是商品身份、结构、颜色和包装文字的主要依据。
 3. 可见事实、用户确认事实和可靠来源事实可以支撑确定性文案；观察不确定项与创意假设不能升级为产品承诺。
 4. 每张图只承担一个主要沟通任务，人物、场景、道具、效果和文字共同支撑该任务。
-5. 同一套图统一画幅和视觉系统；面向多个平台时分别输出完整套图计划。
+5. 同一套图统一视觉系统；画幅服从真实发布槽位，统一套图使用单一比例，多槽位合同使用逐图比例；面向多个平台时分别输出完整计划。
 6. 策划说明、生成提示词、负面约束和质量检查使用中文；图内文案服从目标市场；包装原文保持不变。
 7. 精确参数、长文案和品牌级排版优先采用无字底图与确定性后期排版。
 8. 任何可执行页面都必须绑定真实可用的原始参考；素材不支持的页面进入暂缓模块。
@@ -40,9 +40,19 @@ description: Use when a user provides product photos or a short product brief an
 
 不要仅凭文件名、品类常识或生成结果补全不可见结构。
 
-### 3. 判断平台、市场与语言
+### 3. 判断平台、发布面、市场与语言
 
-读取 [平台与语言规则](references/platform-language-rules.md)。平台规则可能变化；声称强制要求前先查询目标站点的当前官方资料，并记录核验时间与来源。
+读取 [平台与语言规则](references/platform-language-rules.md) 和 [平台图片规则库](references/platform-requirements.json)。先区分商品详情图、A+、店铺装修、图文笔记、视频封面和广告素材，再选择准确的 `platform_profile_id`。已知市场平台和已知品牌官网画像都必须绑定规则库；只有作品集或真正的自定义项目才使用项目画像。平台规则可能变化；声称强制要求前先查询目标站点的当前官方资料，并记录核验时间、验证状态、来源和发布前复核项。
+
+按规则库状态处理：
+
+- `verified_public`：当前公开官方资料足以确认已记录的通用规则，但仍复核目标类目例外。
+- `partial_public`：只采用已证实部分，必须保留发布前复核清单。
+- `live_check_required`：公开资料不足，通用 `hard_rules` 保持为空，必须查看当前账号、站点、类目和上传槽位。
+
+`official_public_archive` 只能支持部分或历史证据，不能单独升级为当前已核验硬规则，并且必须触发发布前复核。用户提供的 `user_contract` 可以增加项目要求，但不能放宽平台官方硬规则。`live_platform_ui` 用于保存当前后台观察证据，但计划验证器不会仅凭来源标签自动提高核验状态、删除硬规则或改写首图合同；若平台确已变化，先人工复核证据、更新规则库和回归测试，再验证计划。
+
+规则库中的 `machine_constraints` 只是能够结构化检查的子集，例如计划张数、发布槽位、首图角色和文字模式。语义真实性、条件规则、类目例外、视觉质量以及 Amazon 逼真 AI 人物 XMP 元数据仍需人工或发布前 QA；不要把脚本通过描述为“全部平台规则已自动验证”。
 
 分开记录：
 
@@ -87,9 +97,10 @@ description: Use when a user provides product photos or a short product brief an
 
 ### 7. 输出并验证计划
 
-读取 [规划输出合同](references/planning-contract.md) 与 [交付记录合同](references/delivery-record-contract.md)，输出可读中文摘要和严格 JSON。生成前先保存 `brief.json`、`inputs/`、`content_plan.md`、`image_set_plan.json` 与 `prompts.md`，再初始化含这些证据路径与 SHA256 的 `run_manifest.json`。将 `<SKILL_DIR>` 替换为本 Skill 目录后运行：
+读取 [规划输出合同](references/planning-contract.md) 与 [交付记录合同](references/delivery-record-contract.md)，输出可读中文摘要和 `version: "3.0"` 的严格 JSON。生成前先保存 `brief.json`、`inputs/`、`content_plan.md`、`image_set_plan.json` 与 `prompts.md`，再初始化含这些证据路径与 SHA256 的 `run_manifest.json`。将 `<SKILL_DIR>` 替换为本 Skill 目录后运行：
 
 ```powershell
+python <SKILL_DIR>/scripts/validate_platform_rules.py <SKILL_DIR>/references/platform-requirements.json
 python <SKILL_DIR>/scripts/validate_plan.py <plan.json>
 ```
 
@@ -101,7 +112,7 @@ python <SKILL_DIR>/scripts/validate_plan.py <plan.json>
 
 每次生成尝试结束后立即更新 `run_manifest.json`：保存尝试序号、起止时间、耗时、`imagegen` 路由、实际提示词及其 SHA256、引用输入路径与 SHA256、状态和成功尝试的原始结果路径与 SHA256。每完成一张就读取 [质量检查与失败恢复](references/qa-and-recovery.md)，按 `qa_checks` 验收；在结构化 `qa_report.json` 中记录复核时间、复核者、身份/事实/平台/文字/构图检查、问题与恢复动作。商品身份、结构、事实或平台合同错误属于致命失败；文字与参数优先转确定性排版修复。
 
-Amazon 计划中的 `main_white` 不得只凭人工 QA 判定通过。按 [交付记录合同](references/delivery-record-contract.md) 写入结构化 `platform_evidence`；让 `validate_delivery.py` 使用 Pillow 重算最终图的最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例和主体高度占比。缺证据或重算不达标时先修图，再更新 QA 哈希。
+Amazon 计划中的 `main_white` 不得只凭人工 QA 判定通过。按 [交付记录合同](references/delivery-record-contract.md) 写入结构化 `platform_evidence`；让 `validate_delivery.py` 使用 Pillow 重算最终图的最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例、前景面积和抗细线主体最长轴占比。500–10000 px 是当前内置 Amazon US 通用接受范围，1000 px 以上是缩放与生产建议；机器白底与主体占比指标只是保守的像素代理，透明、空心、浅色或细长商品可能误报，不能代替目标类目人工复核。若图片包含逼真的 AI 生成人物，还要按当前 Amazon 条件规则人工确认并写入指定 XMP 元数据；当前脚本不验证该元数据。缺证据或重算不达标时先修图或转人工复核，再更新 QA 哈希。
 
 生成结束后保存 `outputs/` 与 `contact_sheet.jpg`，把 `qa_report.json` 和联系表路径与 SHA256 写入 manifest。只有总体和每个计划图片均通过 QA 才是完整生成交付；再运行：
 

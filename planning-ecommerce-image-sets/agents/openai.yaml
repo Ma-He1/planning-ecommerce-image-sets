@@ -1,4 +1,4 @@
 interface:
   display_name: "电商整套图策划"
-  short_description: "从产品参考生成动态套图策划、中文提示词和逐图质检"
-  default_prompt: "使用 $planning-ecommerce-image-sets 根据产品照片、事实和目标平台规划整套电商图片，并在我要求时生成和验收。"
+  short_description: "按可追溯平台规则生成动态套图策划、中文提示词和逐图质检"
+  default_prompt: "使用 $planning-ecommerce-image-sets 根据产品照片、事实、目标平台和当前官方规则规划整套电商图片，并在我要求时使用 Codex 内置图像生成能力生成和验收。"

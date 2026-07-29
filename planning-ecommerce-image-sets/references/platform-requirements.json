@@ -1,0 +1,1489 @@
+{
+  "schema_version": "2.0",
+  "verified_on": "2026-07-29",
+  "policy": {
+    "authority_order": [
+      "经证据复核并更新入本规则库的目标站点当前商家后台提示",
+      "目标站点当前官方公开规则或可确认身份的官方员工公告",
+      "本规则库中仍处于有效范围的官方资料",
+      "用户或项目合同只能增加更严格的项目要求，不得放宽平台规则",
+      "创意与转化建议"
+    ],
+    "verification_statuses": {
+      "verified_public": "当前官方公开资料足以确认这里记录的通用规则；类目附加规则仍需发布前检查。",
+      "partial_public": "官方公开资料只覆盖部分站点、类目、店铺类型或上传渠道，不能外推为平台通用硬规则。",
+      "live_check_required": "公开资料不足以形成稳定通用合同，必须在目标账号、站点和类目中实时核对。"
+    },
+    "interpretation": [
+      "hard_rules 只收录来源直接支持且适用范围明确的强制要求。",
+      "recommendations 不得写入计划的 hard_rules。",
+      "conditional_rules 只有满足 condition 时才可升级为 hard_rules。",
+      "live_check_required 配置的 hard_rules 必须为空，不能用行业经验补齐平台数字。",
+      "同一平台的商品详情图、内容帖子、广告素材和品牌店装修属于不同发布面，不能混用合同。"
+    ]
+  },
+  "profiles": [
+    {
+      "id": "amazon-us-listing-images",
+      "platform": "Amazon",
+      "market": "US",
+      "official_hosts": [
+        "sellercentral.amazon.com"
+      ],
+      "platform_type": "amazon",
+      "verification_status": "verified_public",
+      "scope": "Amazon US 通用商品详情页图片；具体类目风格指南可以增加或替换约束。",
+      "first_image_rule": "main_white",
+      "overlay_language_default": "en-US",
+      "machine_constraints": {
+        "min_plan_images": 1,
+        "max_plan_images": null,
+        "required_first_role": "main_white",
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "amazon-us-at-least-one-image",
+          "amazon-us-main-pure-white",
+          "amazon-us-main-no-overlays"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "amazon-us-at-least-one-image",
+          "applies_to": "all_listing_images",
+          "claim": "每个商品至少需要 1 张图片。",
+          "source_ids": [
+            "amazon-us-technical"
+          ]
+        },
+        {
+          "id": "amazon-us-500-to-10000-px",
+          "applies_to": "all_listing_images",
+          "claim": "图片最长边必须在 500 至 10000 像素之间。",
+          "source_ids": [
+            "amazon-us-technical"
+          ]
+        },
+        {
+          "id": "amazon-us-file-formats",
+          "applies_to": "all_listing_images",
+          "claim": "支持 JPEG、TIFF、PNG 或非动画 GIF，图片需清晰且无像素化或锯齿。",
+          "source_ids": [
+            "amazon-us-technical"
+          ]
+        },
+        {
+          "id": "amazon-us-main-pure-white",
+          "applies_to": "main_image",
+          "claim": "主图背景为纯白色，RGB 为 255、255、255。",
+          "source_ids": [
+            "amazon-us-main-image"
+          ]
+        },
+        {
+          "id": "amazon-us-main-no-overlays",
+          "applies_to": "main_image",
+          "claim": "主图不得添加文字、图形或水印。",
+          "source_ids": [
+            "amazon-us-main-image"
+          ]
+        },
+        {
+          "id": "amazon-us-main-actual-product",
+          "applies_to": "main_image",
+          "claim": "主图展示实际售卖商品，不使用插画，也不加入未随商品交付的道具或配件。",
+          "source_ids": [
+            "amazon-us-main-image"
+          ]
+        },
+        {
+          "id": "amazon-us-main-fill-85",
+          "applies_to": "main_image",
+          "claim": "主图中的商品应占画面框架的 85% 或以上。",
+          "source_ids": [
+            "amazon-us-main-image"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "amazon-us-zoom-1000-px",
+          "applies_to": "all_listing_images",
+          "claim": "生产文件的最长边优先大于 1000 像素，以支持缩放；这不是 500 像素发布底线的替代说法。",
+          "source_ids": [
+            "amazon-us-technical"
+          ]
+        },
+        {
+          "id": "amazon-us-six-images-one-video",
+          "applies_to": "listing_set",
+          "claim": "Amazon 建议准备至少 6 张图片和 1 条视频，但图片张数仍应服从商品信息与可用素材。",
+          "source_ids": [
+            "amazon-us-technical"
+          ]
+        },
+        {
+          "id": "amazon-us-secondary-evidence",
+          "applies_to": "additional_images",
+          "claim": "副图可用多角度、细节、尺寸、使用场景和信息图解释商品。",
+          "source_ids": [
+            "amazon-us-main-image"
+          ]
+        }
+      ],
+      "conditional_rules": [
+        {
+          "id": "amazon-global-synthetic-performer-metadata",
+          "condition": "商品图片或 A+ 素材包含逼真的 AI 生成人物。",
+          "applies_to": "listing_images_and_a_plus_media",
+          "claim": "上传前必须在 XMP 的 dc:subject 字段加入 contains-synthetic-performer；仅有真实人物、非逼真人物或完全无人像时不适用。",
+          "source_ids": [
+            "amazon-global-ai-performer-tag"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "目标类目的主图风格指南与特殊禁限项",
+        "目标站点当前可用图片槽位与视频/A+权限",
+        "服装、图书、珠宝、成人用品等类目的模特、包装或展示例外"
+      ],
+      "sources": [
+        {
+          "id": "amazon-us-technical",
+          "title": "Listings Lounge: Product Image Requirements",
+          "url": "https://sellercentral.amazon.com/seller-forums/discussions/t/4b3c4c39-6f8c-4312-aa0e-99982eb8f5e1",
+          "source_type": "official_staff",
+          "checked_on": "2026-07-29",
+          "notes": "Amazon 官方员工发布的技术要求摘要；原帮助页部分内容需要 Seller Central 登录。"
+        },
+        {
+          "id": "amazon-us-main-image",
+          "title": "Product Image Requirements and Best Practices",
+          "url": "https://sellercentral.amazon.com/seller-forums/discussions/t/13af96ea-6b07-4bf9-8dbe-a13292c2e3b1",
+          "source_type": "official_staff",
+          "checked_on": "2026-07-29",
+          "notes": "Amazon 官方员工汇总主图要求和副图建议；类目风格指南优先。"
+        },
+        {
+          "id": "amazon-global-ai-performer-tag",
+          "title": "You must now tag AI-generated people in listings and A+ content",
+          "url": "https://sellercentral.amazon.com/seller-forums/discussions/t/aa0aee06-aff4-497a-a4b6-9b2ebe06f715",
+          "source_type": "official_staff",
+          "checked_on": "2026-07-29",
+          "notes": "Amazon 全球商店公告；仅适用于包含逼真 AI 生成人物的商品图片、视频和 A+ 素材。"
+        }
+      ]
+    },
+    {
+      "id": "ebay-us-listing-images",
+      "platform": "eBay",
+      "market": "US",
+      "official_hosts": [
+        "www.ebay.com"
+      ],
+      "platform_type": "global_marketplace",
+      "verification_status": "verified_public",
+      "scope": "eBay US 普通商品刊登图片。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "en-US",
+      "machine_constraints": {
+        "min_plan_images": 1,
+        "max_plan_images": 24,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none"
+        ],
+        "source_rule_ids": [
+          "ebay-us-at-least-one",
+          "ebay-us-no-added-marketing",
+          "ebay-us-upload-limits"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "ebay-us-at-least-one",
+          "applies_to": "listing_set",
+          "claim": "每个刊登至少包含 1 张图片，最长边至少 500 像素。",
+          "source_ids": [
+            "ebay-picture-policy"
+          ]
+        },
+        {
+          "id": "ebay-us-no-added-marketing",
+          "applies_to": "all_listing_images",
+          "claim": "图片不得添加边框、文字、艺术图形、营销材料或任何形式的水印。",
+          "source_ids": [
+            "ebay-picture-policy"
+          ]
+        },
+        {
+          "id": "ebay-us-accurate-item",
+          "applies_to": "all_listing_images",
+          "claim": "图片必须准确代表商品，不得用占位图传递信息。",
+          "source_ids": [
+            "ebay-picture-policy"
+          ]
+        },
+        {
+          "id": "ebay-us-no-stock-used",
+          "applies_to": "used_damaged_defective_items",
+          "claim": "二手、损坏或有缺陷的商品不得使用库存图或目录图替代实物照片。",
+          "source_ids": [
+            "ebay-picture-policy"
+          ]
+        },
+        {
+          "id": "ebay-us-upload-limits",
+          "applies_to": "listing_set",
+          "claim": "每个刊登最多可添加 24 张图片，单张上传文件最大 12MB。",
+          "source_ids": [
+            "ebay-adding-pictures"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "ebay-us-1600-square",
+          "applies_to": "all_listing_images",
+          "claim": "建议约 1600 × 1600 像素；1:1 或 16:9 通常显示较好。",
+          "source_ids": [
+            "ebay-adding-pictures"
+          ]
+        },
+        {
+          "id": "ebay-us-main-face-on",
+          "applies_to": "main_image",
+          "claim": "主图完整、正面展示售卖商品，使用整洁中性背景；白色通常较合适，但反光商品可用更深背景。",
+          "source_ids": [
+            "ebay-adding-pictures"
+          ]
+        },
+        {
+          "id": "ebay-us-condition-evidence",
+          "applies_to": "additional_images",
+          "claim": "补充不同角度、细节、瑕疵、尺寸参照和套装内容，减少预期偏差。",
+          "source_ids": [
+            "ebay-adding-pictures"
+          ]
+        }
+      ],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "汽车、房产、收藏卡等特殊刊登工具的图片要求",
+        "目标类目是否允许或要求目录图"
+      ],
+      "sources": [
+        {
+          "id": "ebay-picture-policy",
+          "title": "Picture policy",
+          "url": "https://www.ebay.com/help/listing-policies/policies/picture-policy?id=4370",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "eBay US 图片政策。"
+        },
+        {
+          "id": "ebay-adding-pictures",
+          "title": "Adding pictures to your listings",
+          "url": "https://www.ebay.com/help/selling/listings/photos-videos?id=4148",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "eBay US 上传限制与拍摄建议。"
+        }
+      ]
+    },
+    {
+      "id": "etsy-listing-images",
+      "platform": "Etsy",
+      "market": "Global help center",
+      "official_hosts": [
+        "help.etsy.com",
+        "www.etsy.com"
+      ],
+      "platform_type": "global_marketplace",
+      "verification_status": "verified_public",
+      "scope": "Etsy 商品 listing 图片，不含店铺横幅和广告素材。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "target_market",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": 20,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "etsy-up-to-20-photos"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "etsy-supported-file-types",
+          "applies_to": "all_listing_images",
+          "claim": "支持 JPG、GIF、PNG、SVG 或 HEIC；动画 GIF 和透明 PNG 不受支持，透明区域会显示为黑色。",
+          "source_ids": [
+            "etsy-image-requirements"
+          ]
+        },
+        {
+          "id": "etsy-up-to-20-photos",
+          "applies_to": "listing_set",
+          "claim": "每个 listing 最多可添加 20 张照片。",
+          "source_ids": [
+            "etsy-create-listing"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "etsy-2000-px",
+          "applies_to": "all_listing_images",
+          "claim": "建议图片宽和高均至少 2000 像素；第一张宽和高至少 635 像素可避免搜索展示受影响。",
+          "source_ids": [
+            "etsy-image-requirements"
+          ]
+        },
+        {
+          "id": "etsy-first-horizontal",
+          "applies_to": "main_image",
+          "claim": "第一张优先使用横向构图，方形也可；保持焦点居中，并预留可被方形、竖向和横向缩略图裁切的空间。",
+          "source_ids": [
+            "etsy-image-requirements"
+          ]
+        },
+        {
+          "id": "etsy-consistent-shape",
+          "applies_to": "listing_set",
+          "claim": "同一 listing 使用一致的图片形状，并在缩略图工具中预览裁切。",
+          "source_ids": [
+            "etsy-image-requirements"
+          ]
+        }
+      ],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "手工、古董、数字商品和受监管品类的额外真实性要求",
+        "目标市场当前搜索可见性提示"
+      ],
+      "sources": [
+        {
+          "id": "etsy-image-requirements",
+          "title": "Requirements and Best Practices for Images in Your Etsy Shop",
+          "url": "https://help.etsy.com/hc/en-us/articles/115015663347-Requirements-and-Best-Practices-for-Images-in-Your-Etsy-Shop",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "Etsy 图片格式、尺寸与缩略图建议。"
+        },
+        {
+          "id": "etsy-create-listing",
+          "title": "How to Create a Listing",
+          "url": "https://help.etsy.com/hc/en-us/articles/115015628707-How-to-Create-a-Listing",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "Etsy listing 当前图片槽位数量。"
+        }
+      ]
+    },
+    {
+      "id": "walmart-us-listing-images",
+      "platform": "Walmart Marketplace",
+      "market": "US",
+      "official_hosts": [
+        "marketplacelearn.walmart.com"
+      ],
+      "platform_type": "global_marketplace",
+      "verification_status": "verified_public",
+      "scope": "Walmart.com Marketplace 商品详情页图片；类目 Content Standards 可增加要求。",
+      "first_image_rule": "main_white",
+      "overlay_language_default": "en-US",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": "main_white",
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "walmart-us-white-background",
+          "walmart-us-no-misleading-content"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "walmart-us-file-contract",
+          "applies_to": "all_listing_images",
+          "claim": "图片使用 JPEG、JPG、PNG 或 BMP，RGB、8 位每像素，单张不超过 5MB；不接受 GIF。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-square-contract",
+          "applies_to": "all_listing_images",
+          "claim": "平台列出的像素尺寸为 2200 × 2200，画幅为 1:1。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-white-background",
+          "applies_to": "main_image",
+          "claim": "主图使用无缝纯白背景，RGB 为 255、255、255；大型商品可按官方说明在预期环境中展示。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-no-stock",
+          "applies_to": "all_listing_images",
+          "claim": "不得使用库存图，必须使用准确反映实际售卖商品的图片。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-no-misleading-content",
+          "applies_to": "all_listing_images",
+          "claim": "图片不得重复，不得出现售罄/缺货提示、商品宣传主张或促销语言；主图不得带水印、卖家名称或标志，也不得展示未包含的配件。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "walmart-us-four-images",
+          "applies_to": "listing_set",
+          "claim": "官方建议每个 listing 至少上传 4 张图片。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-zoom-1500",
+          "applies_to": "all_listing_images",
+          "claim": "1500 × 1500 是官方列出的缩放最低像素，不应误写成所有商品的最小发布尺寸。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        },
+        {
+          "id": "walmart-us-tight-crop",
+          "applies_to": "all_listing_images",
+          "claim": "在不裁掉商品的前提下紧凑构图，避免过量留白，不放大小图冒充高分辨率。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        }
+      ],
+      "conditional_rules": [
+        {
+          "id": "walmart-us-english-image-copy",
+          "condition": "图片包含新增说明文字，且没有适用的法律或类目例外。",
+          "applies_to": "all_listing_images",
+          "claim": "图片不应包含英语以外的语言；同时核对包装原文与法规标签是否属于必须保留内容。",
+          "source_ids": [
+            "walmart-us-image-guidelines"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "目标类目 Content Standards",
+        "大型商品环境图例外",
+        "品牌所有者和授权经销商的内容控制权限"
+      ],
+      "sources": [
+        {
+          "id": "walmart-us-image-guidelines",
+          "title": "Product detail page: Image guidelines & requirements",
+          "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content%2C%20imagery%2C%20and%20media/Product-detail-page%3A-Image-guidelines-%26-requirements?locale=en-US",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "页面标注最后更新于 2026-05-12。"
+        }
+      ]
+    },
+    {
+      "id": "tiktok-shop-us-listing-images",
+      "platform": "TikTok Shop",
+      "market": "US",
+      "official_hosts": [
+        "seller-us.tiktok.com"
+      ],
+      "platform_type": "social_commerce",
+      "verification_status": "verified_public",
+      "scope": "TikTok Shop US 商品详情页 listing 图片，不等同于短视频、可购物图片帖子或广告素材。",
+      "first_image_rule": "main_white",
+      "overlay_language_default": "en-US",
+      "machine_constraints": {
+        "min_plan_images": 1,
+        "max_plan_images": 9,
+        "required_first_role": "main_white",
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none"
+        ],
+        "source_rule_ids": [
+          "tiktok-shop-us-image-count",
+          "tiktok-shop-us-main-front-white",
+          "tiktok-shop-us-no-overlays"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "tiktok-shop-us-image-count",
+          "applies_to": "listing_set",
+          "claim": "商品至少需要 1 张图片，最多 9 张；必须选择 1 张作为主图。",
+          "source_ids": [
+            "tiktok-shop-us-add-products",
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-min-resolution",
+          "applies_to": "all_listing_images",
+          "claim": "所有商品图片至少为 600 × 600 像素。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-main-front-white",
+          "applies_to": "main_image",
+          "claim": "主图展示商品正面实物，使用纯白背景，客观直接地呈现售卖商品。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-no-overlays",
+          "applies_to": "all_listing_images",
+          "claim": "所有商品图片不得添加标志、文字、边框、水印或覆盖商品/背景的图形。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-accurate-real-product",
+          "applies_to": "all_listing_images",
+          "claim": "图片必须准确清晰展示实际售卖且会交付的商品；不允许占位图或数字渲染图，图片必须为彩色。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-upload-file-contract",
+          "applies_to": "all_listing_images",
+          "claim": "单张最大 10MB，支持 JPG、JPEG、PNG。",
+          "source_ids": [
+            "tiktok-shop-us-add-products"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "tiktok-shop-us-square-preferred",
+          "applies_to": "all_listing_images",
+          "claim": "商品 listing 图片优先按 1:1 制作，以适配平台的标准方形展示。",
+          "source_ids": [
+            "tiktok-shop-us-add-products"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-multi-angle",
+          "applies_to": "additional_images",
+          "claim": "副图展示正面、背面、侧面、配件、细节、使用场景、尺寸或比例，不重复同一角度。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        }
+      ],
+      "conditional_rules": [
+        {
+          "id": "tiktok-shop-us-bulk-upload-aspect-ratio",
+          "condition": "使用 TikTok Shop US 的 Excel 或批量上传路径，且当前模板仍提供自动补边处理。",
+          "applies_to": "bulk_or_excel_upload_images",
+          "claim": "Excel 或批量上传路径可接受 3:4 至 4:3 的图片并自动补边；此条件规则不得外推为 Seller Center 所有上传方式的通用比例合同。",
+          "source_ids": [
+            "tiktok-shop-us-add-products"
+          ]
+        },
+        {
+          "id": "tiktok-shop-us-child-apparel",
+          "condition": "商品为儿童泳装或儿童内衣。",
+          "applies_to": "all_listing_images",
+          "claim": "商品必须平铺展示，不得使用儿童模特或人体模型。",
+          "source_ids": [
+            "tiktok-shop-us-product-listing-policy"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "目标类目的额外合规、标签和警示要求",
+        "Seller Center 单品上传与批量模板的当前差异",
+        "商品 listing、可购物图片帖子和广告素材的不同合同"
+      ],
+      "sources": [
+        {
+          "id": "tiktok-shop-us-product-listing-policy",
+          "title": "Product Listing Policy",
+          "url": "https://seller-us.tiktok.com/university/essay?knowledge_id=3196690250417921",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "TikTok Shop US 商品 listing 政策。"
+        },
+        {
+          "id": "tiktok-shop-us-add-products",
+          "title": "How to Add Products to Your Shop",
+          "url": "https://seller-us.tiktok.com/university/essay?knowledge_id=6581713858676522&lang=en",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "页面日期 2026-05-19，包含上传格式、大小、数量与比例说明。"
+        }
+      ]
+    },
+    {
+      "id": "shopify-product-media",
+      "platform": "Shopify",
+      "market": "Global",
+      "official_hosts": [
+        "help.shopify.com"
+      ],
+      "platform_type": "brand_site",
+      "verification_status": "verified_public",
+      "scope": "Shopify Admin 商品与商品集合图片；实际前台裁切、槽位和响应式显示由当前主题决定。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "target_market",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": 250,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "shopify-product-media-count"
+        ]
+      },
+      "hard_rules": [
+        {
+          "id": "shopify-product-image-upload-limits",
+          "applies_to": "product_and_collection_images",
+          "claim": "商品与商品集合图片最大为 5000 × 5000 像素或 25MP，单张文件必须小于 20MB。",
+          "source_ids": [
+            "shopify-product-media-types"
+          ]
+        },
+        {
+          "id": "shopify-product-image-file-types",
+          "applies_to": "product_images",
+          "claim": "Shopify 商品图片支持 PNG、JPEG、PSD、TIFF、BMP、GIF、SVG、HEIC 和 WebP；部分格式上传后会由 Shopify 转换或按浏览器能力分发。",
+          "source_ids": [
+            "shopify-product-media-types"
+          ]
+        },
+        {
+          "id": "shopify-product-media-count",
+          "applies_to": "product_media_set",
+          "claim": "每个商品最多可添加 250 个图片、3D 模型或视频媒体项。",
+          "source_ids": [
+            "shopify-add-product-media"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "shopify-square-2048",
+          "applies_to": "square_product_images",
+          "claim": "方形商品图通常以 2048 × 2048 像素显示效果较好，这是官方建议，不是唯一允许尺寸。",
+          "source_ids": [
+            "shopify-product-media-types"
+          ]
+        },
+        {
+          "id": "shopify-featured-consistent-ratio",
+          "applies_to": "featured_product_images",
+          "claim": "并排展示的商品首图宜保持一致比例，以减少集合页高低不齐；主题也可能通过 CDN 请求统一尺寸。",
+          "source_ids": [
+            "shopify-product-media-types"
+          ]
+        }
+      ],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "当前主题的商品页、集合页、购物车和首页组件槽位及裁切方式",
+        "主题是否支持视频、3D 模型、焦点和响应式 art direction",
+        "销售渠道、应用和 metafield 对媒体格式与数量的追加限制"
+      ],
+      "sources": [
+        {
+          "id": "shopify-product-media-types",
+          "title": "Shopify Help Center: Product media types",
+          "url": "https://help.shopify.com/en/manual/products/product-media/product-media-types",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "Shopify 官方商品图片类型、尺寸、文件大小和主题显示说明。"
+        },
+        {
+          "id": "shopify-add-product-media",
+          "title": "Shopify Help Center: Adding product media",
+          "url": "https://help.shopify.com/en/manual/products/product-media/add-media",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "Shopify 官方商品媒体数量和管理说明。"
+        }
+      ]
+    },
+    {
+      "id": "shopee-marketplace-listing-images",
+      "platform": "Shopee",
+      "market": "Site-specific",
+      "official_hosts": [
+        "cdngarenanow-a.akamaihd.net"
+      ],
+      "platform_type": "global_marketplace",
+      "verification_status": "partial_public",
+      "scope": "Shopee 各站点普通店与 Shopee Mall 的公开卖家教育资料；不同站点和店铺类型不能互相外推。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "target_market",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [],
+      "recommendations": [
+        {
+          "id": "shopee-my-basic-square",
+          "applies_to": "Malaysia seller education example",
+          "claim": "马来西亚基础课程建议 1024 × 1024 以上、1:1、白底、商品占较长轴 75% 以上；这是站点建议，不是全 Shopee 硬规则。",
+          "source_ids": [
+            "shopee-my-basic-archive"
+          ]
+        }
+      ],
+      "conditional_rules": [
+        {
+          "id": "shopee-mall-cover",
+          "condition": "目标账号属于引用资料所覆盖站点的 Shopee Mall，且后台当前规则仍一致。",
+          "applies_to": "cover_image",
+          "claim": "Mall 指南要求至少 3 张不重复图片；封面使用纯色背景，商品至少覆盖 60%，且对水印、拼图、边框、文字、标志和模特有专门限制与例外。",
+          "source_ids": [
+            "shopee-mall-listing-archive"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "具体国家/地区站点",
+        "普通店、优选卖家与 Shopee Mall 的差异",
+        "目标类目的封面、张数、文字、水印、尺寸、文件大小与模特规则",
+        "当前 Seller Centre 上传提示"
+      ],
+      "sources": [
+        {
+          "id": "shopee-my-basic-archive",
+          "title": "Shopee Uni Basic - Product Listing Guide",
+          "url": "https://cdngarenanow-a.akamaihd.net/shopee/seller/seller_cms/9ea9de96f9fbb81adeff19e4abe60f48/%5BMY%5D%20Shopee%20Uni%20Basic%20-%20Eng.pdf",
+          "source_type": "official_public_archive",
+          "checked_on": "2026-07-29",
+          "notes": "Shopee Seller Education Hub 马来西亚资料；仅作为站点建议线索。"
+        },
+        {
+          "id": "shopee-mall-listing-archive",
+          "title": "Shopee Mall Listing Guidelines",
+          "url": "https://cdngarenanow-a.akamaihd.net/shopee/seller/seller_cms/b71e298c6c220f22ef6f08608dbe1bd8/Mall%20Listing%20Guidelines.pdf",
+          "source_type": "official_public_archive",
+          "checked_on": "2026-07-29",
+          "notes": "Shopee Seller Education Hub 历史 Mall 指南，不能当作所有站点当前通用规则。"
+        }
+      ]
+    },
+    {
+      "id": "lazada-marketplace-listing-images",
+      "platform": "Lazada",
+      "market": "Site-specific",
+      "official_hosts": [
+        "open.lazada.com",
+        "img-ovs.alicdn.com"
+      ],
+      "platform_type": "global_marketplace",
+      "verification_status": "partial_public",
+      "scope": "Lazada Open Platform 商品图片字段与公开大学资料；视觉规范仍按具体站点实时核对。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "target_market",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [
+        {
+          "id": "lazada-api-eight-images",
+          "applies_to": "Open Platform API Images field",
+          "claim": "通过 Open Platform 商品 Images 字段时，每个字段最多传入 8 张图片且不能重复，并需先转换为 Lazada 内链。",
+          "source_ids": [
+            "lazada-open-platform-create-product"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "lazada-clear-multi-angle",
+          "applies_to": "listing_set",
+          "claim": "公开课程建议使用清晰、信息充分的多角度商品图片；具体尺寸与封面规则仍以站点后台为准。",
+          "source_ids": [
+            "lazada-content-quality-archive"
+          ]
+        }
+      ],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "具体国家/地区站点与 Seller Center 当前模板",
+        "主图比例、像素、背景、文字、水印、文件大小和类目附加规则",
+        "手工上传、批量模板与 Open Platform API 的差异"
+      ],
+      "sources": [
+        {
+          "id": "lazada-open-platform-create-product",
+          "title": "Open Platform Create Product",
+          "url": "https://open.lazada.com/apps/doc/doc?docId=121541&nodeId=45661",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "Lazada 官方 Open Platform 字段限制，不代表所有 Seller Center 视觉规则。"
+        },
+        {
+          "id": "lazada-content-quality-archive",
+          "title": "What Is Content Quality?",
+          "url": "https://img-ovs.alicdn.com/other/common/26cdee8bca2e45379fdf6c15b1779472",
+          "source_type": "official_public_archive",
+          "checked_on": "2026-07-29",
+          "notes": "Lazada 旧版课程，只作为创意建议。"
+        }
+      ]
+    },
+    {
+      "id": "taobao-cn-listing-images",
+      "platform": "淘宝",
+      "market": "CN",
+      "official_hosts": [
+        "rulechannel.taobao.com",
+        "rule.taobao.com"
+      ],
+      "platform_type": "domestic_marketplace",
+      "verification_status": "verified_public",
+      "scope": "淘宝商品主图、SKU 图和详情素材的公开通用规则；叶子类目、店铺类型、订购服务与发布器可追加要求。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [
+        {
+          "id": "taobao-cn-clear-recognizable",
+          "applies_to": "all_product_images",
+          "claim": "图片必须清晰、易识别并突出商品；不得使用纯文字图、重复图、压缩图、诱导点击图，不得以文字牛皮癣遮挡商品主体。",
+          "source_ids": [
+            "taobao-product-publishing-spec"
+          ]
+        },
+        {
+          "id": "taobao-cn-truthful-consistent",
+          "applies_to": "listing_content",
+          "claim": "标题、属性、图片和详情必须真实且保持一致，图片不得变形、失真或引人不适。",
+          "source_ids": [
+            "taobao-product-publishing-spec",
+            "taobao-tmall-image-authenticity"
+          ]
+        },
+        {
+          "id": "taobao-cn-no-external-diversion",
+          "applies_to": "listing_content",
+          "claim": "不得展示第三方网站或应用名称、标志、二维码、链接、账号和联系方式等站外导流信息。",
+          "source_ids": [
+            "taobao-product-publishing-spec"
+          ]
+        },
+        {
+          "id": "taobao-cn-no-ai-product-distortion",
+          "applies_to": "ai_or_composited_product_images",
+          "claim": "AI 或合成图片不得实质扭曲商品材质、纹理、褶皱、款式或使用效果，不得出现违反物理规律的场景、畸形人体、明显贴图白边或批量换款换色造成的失真。",
+          "source_ids": [
+            "taobao-tmall-image-authenticity"
+          ]
+        }
+      ],
+      "recommendations": [],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "在淘宝商家后台选择准确类目后读取当前图片模板",
+        "主图、SKU 图、详情图分别核对比例、像素、张数、文件大小和格式",
+        "核对文字、水印、牛皮癣、促销信息、模特与类目必展示内容",
+        "核对店铺订购服务是否改变图片数量"
+      ],
+      "sources": [
+        {
+          "id": "taobao-product-publishing-spec",
+          "title": "淘宝网商品发布规范",
+          "url": "https://rulechannel.taobao.com/?type=detail&ruleId=11003990&cId=1138#/rule/detail?ruleId=11003990&cId=1138",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "公开通用规则，最新修订日期为 2025-07-24；系统提示与类目专项规则优先补充。"
+        },
+        {
+          "id": "taobao-tmall-image-authenticity",
+          "title": "淘宝平台关于商品图片不失真的规则解读",
+          "url": "https://rule.taobao.com/?type=detail&ruleId=20007379&cId=1186#/rule/detail?ruleId=20007379&cId=1186",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "2026-07-17 的官方解读，同时引用淘宝和天猫条款，明确 AI 与合成商品图不得失真。"
+        }
+      ]
+    },
+    {
+      "id": "tmall-cn-listing-images",
+      "platform": "天猫",
+      "market": "CN",
+      "official_hosts": [
+        "rulechannel.tmall.com",
+        "rule.taobao.com",
+        "g.alicdn.com"
+      ],
+      "platform_type": "domestic_marketplace",
+      "verification_status": "partial_public",
+      "scope": "天猫商品图片；公开现行资料只足以确认淘宝与天猫共同适用的商品图片不失真要求，其余要求按叶子类目和当前商家后台核对。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [
+        {
+          "id": "tmall-cn-no-ai-product-distortion",
+          "applies_to": "ai_or_composited_product_images",
+          "claim": "AI 或合成图片不得实质扭曲商品材质、纹理、褶皱、款式或使用效果，不得出现违反物理规律的场景、畸形人体、明显贴图白边或批量换款换色造成的失真。",
+          "source_ids": [
+            "taobao-tmall-image-authenticity"
+          ]
+        }
+      ],
+      "recommendations": [],
+      "conditional_rules": [
+        {
+          "id": "tmall-current-category-image-contract",
+          "condition": "已在天猫规则平台或商家后台打开目标叶子类目的现行商品发布规范，并记录适用类目、规则版本与读取日期。",
+          "applies_to": "authenticated_current_category_image_slots",
+          "claim": "仅将当前页面明确列出的主图、SKU 图和详情图比例、像素、张数、格式、背景、文字及水印要求升级为本次发布合同，不外推到其他类目。",
+          "source_ids": [
+            "tmall-current-product-publishing-spec"
+          ]
+        },
+        {
+          "id": "tmall-fallback-main-image-standard",
+          "condition": "天猫目标叶子类目没有独立商品发布规范，且当前发布规范索引仍明确指向该旧版兜底标准。",
+          "applies_to": "tmall_checked_main_image_slot",
+          "claim": "使用真实商品图，不得拼接、加边框、水印或促销文字；商标权人标志可按兜底标准限定位置和占比。",
+          "source_ids": [
+            "tmall-fallback-main-image-standard"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "在天猫商家后台选择准确叶子类目后读取当前商品发布规范和图片模板",
+        "主图、SKU 图、详情图分别核对比例、像素、张数、文件大小和格式",
+        "核对文字、水印、促销信息、模特与类目必展示内容",
+        "确认旧版兜底标准是否仍被当前规范索引引用"
+      ],
+      "sources": [
+        {
+          "id": "taobao-tmall-image-authenticity",
+          "title": "淘宝平台关于商品图片不失真的规则解读",
+          "url": "https://rule.taobao.com/?type=detail&ruleId=20007379&cId=1186#/rule/detail?ruleId=20007379&cId=1186",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "2026-07-17 的官方解读，同时引用淘宝和天猫条款，明确 AI 与合成商品图不得失真。"
+        },
+        {
+          "id": "tmall-current-product-publishing-spec",
+          "title": "天猫商品发布规范",
+          "url": "https://rulechannel.tmall.com/?type=detail&ruleId=20004955&cId=45005#/rule/detail?ruleId=20004955&cId=45005",
+          "source_type": "official_authenticated",
+          "checked_on": "2026-07-29",
+          "notes": "当前规则入口可能需要登录或按类目跳转；只有完成目标类目实时读取后才可把具体图片规格写入本次合同。"
+        },
+        {
+          "id": "tmall-fallback-main-image-standard",
+          "title": "天猫 malllist 主图发布管理规范",
+          "url": "https://g.alicdn.com/mui/zebra-seller-tmallqc-static/3.2.23/hangye/tian_mao_malllist_zhu_tu_fa_bu_guan_li_hang_ye_biao_zhun.html",
+          "source_type": "official_public_archive",
+          "checked_on": "2026-07-29",
+          "notes": "旧版兜底标准，仅在目标类目没有独立发布规范且当前索引仍引用时适用，不能外推到全部天猫商品。"
+        }
+      ]
+    },
+    {
+      "id": "jd-cn-listing-images",
+      "platform": "京东",
+      "market": "CN",
+      "official_hosts": [
+        "pro.jd.com",
+        "mtt.m.jd.com"
+      ],
+      "platform_type": "domestic_marketplace",
+      "verification_status": "verified_public",
+      "scope": "京东全类目基础主图视觉规范；自营、POP、全球购和有独立规范的类目可追加或替换要求。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [
+        {
+          "id": "jd-cn-lawful-truthful",
+          "applies_to": "main_image_set",
+          "claim": "图片不得违法、侵权、虚假夸大，不得擅自使用未授权肖像、字体或贬损性竞品对比。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        },
+        {
+          "id": "jd-cn-no-external-diversion",
+          "applies_to": "main_image_set",
+          "claim": "不得展示外部联系方式、网址、二维码或淘宝、天猫、拼多多、抖音、快手、微信、QQ 等第三方平台信息。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        },
+        {
+          "id": "jd-cn-no-unauthorized-platform-badges",
+          "applies_to": "main_image_set",
+          "claim": "不得擅自使用京东自营、京东物流、秒杀、百亿补贴等平台官方标志。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        },
+        {
+          "id": "jd-cn-main-variant-consistency",
+          "applies_to": "main_image",
+          "claim": "首图展示的商品数量、销售单位、颜色和规格必须与文字信息一致，不得出现无关商品或物体。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        },
+        {
+          "id": "jd-cn-image-quality",
+          "applies_to": "main_image_set",
+          "claim": "图片不得模糊、裁切错误、涂抹、拉伸、变形、压缩或引人不适。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "jd-cn-marketing-area",
+          "applies_to": "main_image_marketing_area",
+          "claim": "官方视觉页要求营销信息不遮挡商品，最多分布在 3 个位置，并以约 35% 作为版面阈值；配套图示含建议性质，不能仅凭该数字断言上传拦截。",
+          "source_ids": [
+            "jd-main-image-visual-spec"
+          ]
+        }
+      ],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "确认京东业务类型、店铺身份与准确类目",
+        "在规则平台或素材中心核对主图、透明图、场景图、SKU 图和详情图槽位",
+        "核对比例、像素、张数、格式、大小、背景、文字、水印和类目必展示内容"
+      ],
+      "sources": [
+        {
+          "id": "jd-main-image-visual-spec",
+          "title": "京东商家视觉规范：主图视觉规范",
+          "url": "https://pro.jd.com/mall/active/SLULn5voab5iB92t9ZLCDUCTBks/index.html",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "官方页面说明新规于 2023 年 3 月发布、2023-04-21 生效；有独立类目规范时执行专项规则。"
+        },
+        {
+          "id": "jd-main-image-course",
+          "title": "商品主图规则和素材中心介绍",
+          "url": "https://mtt.m.jd.com/video/655807577",
+          "source_type": "official_authenticated",
+          "checked_on": "2026-07-29",
+          "notes": "京东官方课程入口；具体类目、素材槽位与发布器规格需登录查看。"
+        }
+      ]
+    },
+    {
+      "id": "pinduoduo-cn-listing-images",
+      "platform": "拼多多",
+      "market": "CN",
+      "official_hosts": [
+        "mms.pinduoduo.com"
+      ],
+      "platform_type": "domestic_marketplace",
+      "verification_status": "verified_public",
+      "scope": "拼多多全平台商品及信息发布基础通则；类目专项规则与后台系统提示可追加要求。",
+      "first_image_rule": "main_product",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": "main_product",
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "pinduoduo-cn-main-mostly-white",
+          "pinduoduo-cn-carousel-no-overlays"
+        ],
+        "required_first_slot": "main_carousel",
+        "slot_allowed_text_modes": {
+          "main_carousel": [
+            "none"
+          ]
+        },
+        "slot_count_constraints": {}
+      },
+      "hard_rules": [
+        {
+          "id": "pinduoduo-cn-main-mostly-white",
+          "applies_to": "main_image",
+          "claim": "主图背景应以纯白为主，商品主体居中，不得添加任何与品牌相关的文字或标志；“以纯白为主”不得误写为全画面严格 RGB 255。",
+          "source_ids": [
+            "pinduoduo-publishing-general-rule"
+          ]
+        },
+        {
+          "id": "pinduoduo-cn-carousel-no-overlays",
+          "applies_to": "main_carousel_images",
+          "claim": "商品主轮播图不得添加任何文字，不得有边框、角标、标签或水印。",
+          "source_ids": [
+            "pinduoduo-publishing-general-rule"
+          ]
+        },
+        {
+          "id": "pinduoduo-cn-clear-not-distorted",
+          "applies_to": "all_product_images",
+          "claim": "商品图片必须清晰美观、不失真，并确保展示的商品外观不变形。",
+          "source_ids": [
+            "pinduoduo-publishing-general-rule"
+          ]
+        }
+      ],
+      "recommendations": [],
+      "conditional_rules": [],
+      "publish_time_recheck": [
+        "在拼多多商家后台打开目标类目当前发布规范和系统上传提示",
+        "分别核对主图、轮播图、SKU 图、长图和详情图",
+        "核对比例、像素、张数、格式、大小和类目追加展示内容"
+      ],
+      "sources": [
+        {
+          "id": "pinduoduo-publishing-general-rule",
+          "title": "拼多多商品及信息发布通则",
+          "url": "https://mms.pinduoduo.com/other/rule?listId=1&id=168",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "官方规则中心仍收录且未标废止；列表更新时间 2019-09-14。该基础通则不提供统一像素、比例、格式、文件大小或张数。"
+        }
+      ]
+    },
+    {
+      "id": "douyin-ecommerce-cn-listing-images",
+      "platform": "抖音电商",
+      "market": "CN",
+      "official_hosts": [
+        "school.jinritemai.com"
+      ],
+      "platform_type": "social_commerce",
+      "verification_status": "verified_public",
+      "scope": "抖店商品主图和详情图通用发布规范；商品卡、直播/短视频封面、图文内容和广告素材不得混用。",
+      "first_image_rule": "main_product",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": "main_product",
+        "first_image_allowed_text_modes": [
+          "none"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": [
+          "douyin-cn-main-image-set"
+        ],
+        "required_first_slot": "main_image",
+        "slot_allowed_text_modes": {
+          "main_image": [
+            "none"
+          ]
+        },
+        "slot_count_constraints": {
+          "main_image": {
+            "min": 3,
+            "max": null
+          }
+        }
+      },
+      "hard_rules": [
+        {
+          "id": "douyin-cn-truthful-consistent",
+          "applies_to": "listing_content",
+          "claim": "商品标题、属性、主图和详情必须真实、完整且保持一致，不得虚假夸大。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        },
+        {
+          "id": "douyin-cn-clear-no-clickbait",
+          "applies_to": "all_product_images",
+          "claim": "图片必须清晰易辨，不得出现牛皮癣、模糊、压缩、异常拼接、诱导点击或引人不适的画面。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        },
+        {
+          "id": "douyin-cn-no-external-diversion",
+          "applies_to": "all_product_images",
+          "claim": "不得展示实体店、银行账号、二维码、非平台链接、非平台水印或非平台联系方式等第三方信息。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        },
+        {
+          "id": "douyin-cn-main-image-set",
+          "applies_to": "main_image_set",
+          "claim": "所有主图除品牌标志外不得包含任何文字或水印；首图必须为商品主体完整正面实物图，不得仅展示局部；主图至少 3 张且不得完全重复。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        },
+        {
+          "id": "douyin-cn-multi-angle-and-variant",
+          "applies_to": "main_image_set",
+          "claim": "辅图应展示侧面、背面、平铺或细节，不能全部为相同角度；商品数量、销售单位、颜色和规格必须与文字一致，不得加入无关物体。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        },
+        {
+          "id": "douyin-cn-real-product-subject",
+          "applies_to": "main_and_detail_images",
+          "claim": "不得用试色效果图、漫画、纯文字、纯色等虚拟图，或山水、空架、仅证书、仅包装、仅人物等无关图代替实际商品主体；商品详情不得只有文字。",
+          "source_ids": [
+            "douyin-product-info-publishing-spec"
+          ]
+        }
+      ],
+      "recommendations": [],
+      "conditional_rules": [
+        {
+          "id": "douyin-blind-box-category",
+          "condition": "商品属于盲盒类，且当前正式规则与公示版本一致。",
+          "applies_to": "main_image_set",
+          "claim": "公开类目规则示例要求 PNG/JPG/JPEG、至少 600 × 600，建议 1:1；第一张展示商品正面全貌与对应款式集合。",
+          "source_ids": [
+            "douyin-blind-box-rule"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "目标类目的商品发布及宣传细则",
+        "主图张数、尺寸、比例、文件大小与必展示顺序",
+        "商品卡主图、直播/短视频封面、图文内容和广告素材的不同合同",
+        "类目资质、标签、警示语、参数与检测信息的必展示位置"
+      ],
+      "sources": [
+        {
+          "id": "douyin-product-info-publishing-spec",
+          "title": "商品信息发布规范",
+          "url": "https://school.jinritemai.com/doudian/web/article/101800",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "适用于平台全部商家，页面时间与最新修订生效日均为 2025-12-03；特别规定和类目新规优先。"
+        },
+        {
+          "id": "douyin-blind-box-rule",
+          "title": "盲盒类商品管理规范公示",
+          "url": "https://school.jinritemai.com/doudian/wap/article/aJjTPFRezqy1",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "2026-05 公示的类目规则示例，不能外推到所有抖音电商品类。"
+        }
+      ]
+    },
+    {
+      "id": "xiaohongshu-cn-product-images",
+      "platform": "小红书",
+      "market": "CN",
+      "official_hosts": [
+        "school.xiaohongshu.com",
+        "ark.xiaohongshu.com"
+      ],
+      "platform_type": "social_commerce",
+      "verification_status": "live_check_required",
+      "scope": "小红书商品详情图片；商品 SPL ITEM 创意编辑、图文笔记封面、信息流广告属于不同发布面。",
+      "first_image_rule": "custom",
+      "overlay_language_default": "zh-CN",
+      "machine_constraints": {
+        "min_plan_images": null,
+        "max_plan_images": null,
+        "required_first_role": null,
+        "first_image_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "all_images_allowed_text_modes": [
+          "none",
+          "direct",
+          "post_layout"
+        ],
+        "source_rule_ids": []
+      },
+      "hard_rules": [],
+      "recommendations": [],
+      "conditional_rules": [
+        {
+          "id": "xiaohongshu-legacy-spl-item-api-images",
+          "condition": "通过旧开放平台 Create SPL ITEM API 发布，且当前接口文档仍确认沿用该字段合同。",
+          "applies_to": "legacy_open_platform_api_product_images",
+          "claim": "商品图为 800 × 800 或 750 × 1000，比例 1:1 或 3:4，格式为 JPG、PNG 或 JPEG；详情图宽 750 至 1242、高不超过 1546，单张不超过 2MB。",
+          "source_ids": [
+            "xiaohongshu-create-spl-item-legacy"
+          ]
+        }
+      ],
+      "publish_time_recheck": [
+        "确认本次是商品详情图、图文笔记、店铺装修还是广告素材",
+        "在开放平台或商家后台核对目标发布面的比例、像素、张数、大小和格式",
+        "核对封面裁切、安全区、文字、品牌标志、价格与导流信息限制",
+        "服饰鞋包等类目核对颜色规格图、尺码与模特展示要求"
+      ],
+      "sources": [
+        {
+          "id": "xiaohongshu-product-structure",
+          "title": "小红书开放平台：商品结构说明",
+          "url": "https://school.xiaohongshu.com/en/open/product/product-structure.html",
+          "source_type": "official_public",
+          "checked_on": "2026-07-29",
+          "notes": "官方页面确认商品图片聚合在 SPL ITEM 创意编辑层，但未公开稳定的通用像素合同。"
+        },
+        {
+          "id": "xiaohongshu-create-spl-item-legacy",
+          "title": "Create SPL ITEM",
+          "url": "https://school.xiaohongshu.com/en/open/product/create-spl-item.html",
+          "source_type": "official_public_archive",
+          "checked_on": "2026-07-29",
+          "notes": "旧开放平台 API 页面，无更新时间且页脚版权为 2014-2018；只能作为该 API 路径的历史条件规则，不能代表当前千帆人工发布器。"
+        },
+        {
+          "id": "xiaohongshu-school",
+          "title": "小红书大学",
+          "url": "https://school.xiaohongshu.com/",
+          "source_type": "official_authenticated",
+          "checked_on": "2026-07-29",
+          "notes": "目标类目与发布面规则需在当前账号环境中查询。"
+        }
+      ]
+    }
+  ]
+}

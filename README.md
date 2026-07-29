@@ -24,8 +24,43 @@
 - 图片数量由事实、素材、买家问题和平台要求共同决定。
 - 未确认的参数、功效、认证、成分和比较结论不能进入确定性卖点。
 - 每张图只承担一个主要沟通任务。
-- 同一套图统一画幅和视觉系统；多个平台分别输出完整计划。
+- 同一套图统一视觉系统；画幅服从真实发布槽位，单一画幅和多槽位比例都可表达；多个平台分别输出完整计划。
 - 策划说明与生成提示词使用中文，图内文案跟随目标市场，包装原文保持不变。
+
+## 平台规则覆盖
+
+Skill 内置机器可读的 `platform-requirements.json`，每条规则记录适用发布面、强制/建议/条件层级、官方来源、核验日期和发布前复核项。当前覆盖 14 个平台画像：
+
+| 画像 | 当前证据状态 | 说明 |
+|---|---|---|
+| Amazon US | 公开规则已核验 | 通用商品详情图；类目例外仍需复核 |
+| eBay US | 公开规则已核验 | 商品刊登图 |
+| Etsy | 公开规则已核验 | 商品 listing 图片 |
+| Walmart US | 公开规则已核验 | Marketplace 商品详情图 |
+| TikTok Shop US | 公开规则已核验 | 商品详情图，不含短视频或广告素材 |
+| Shopify | 公开规则已核验，主题需复核 | 商品媒体上传合同与主题槽位分开 |
+| Shopee | 部分公开 | 站点和 Mall/普通店差异需复核 |
+| Lazada | 部分公开 | Open Platform API 与 Seller Center 不混用 |
+| 淘宝 | 基础公开规则已核验 | 淘宝通用发布规则；像素、比例和叶子类目规则需后台复核 |
+| 天猫 | 部分公开 | 只固化淘宝与天猫共同适用的 AI 图片不失真规则，其余按当前类目与后台复核 |
+| 京东 | 基础公开规则已核验 | 业务类型和类目专项规则需后台复核 |
+| 拼多多 | 基础公开规则已核验 | 动态上传规格需后台复核 |
+| 抖音电商 | 通用公开规则已核验 | 商品详情图与内容封面分开 |
+| 小红书 | 必须实时核验 | 旧开放平台 API 仅作条件规则 |
+
+规则库本次核验日期为 2026-07-29。平台规则会变化，发布时仍需按目标国家/地区、类目、账号和当前发布器复核。公开资料不足的平台不会用第三方博客数字补齐，也不会把建议值伪装成发布硬门槛。官方来源 URL 还会按画像的官方域名白名单校验，历史官方课件只能作为部分证据，不能自行升级为当前通用硬规则。
+
+规则库同时给每个画像声明一个最小 `machine_constraints` 子集，用于检查计划总张数、发布槽位张数、首图角色和文字模式；`hard_rules` 还必须与唯一的稳定 `hard_rule_ids` 一一绑定，`verified_current` 计划必须完整继承画像通用硬规则。机器通过不等于平台全部合规，类目例外、条件规则、商品真实性、审美和当前发布后台仍需人工复核。
+
+`user_contract` 和普通链接不能放宽内置平台规则。`live_platform_ui` 可以作为审计来源，但不会仅凭标签自动提高核验状态、删除硬规则或改写首图合同；平台确有变化时，应先复核证据、更新规则库并跑完回归测试。
+
+几个容易混淆、已在规则库中明确分开的例子：
+
+- Amazon US 通用图片最长边公开发布范围为 500–10,000 px；1000 px 以上是支持缩放的生产建议，不是发布底线。
+- eBay 的文字、营销图形和水印禁限适用于全部刊登图片；它没有通用强制纯白背景。
+- Etsy 没有全站统一白底或固定比例硬规则，首图应为不同缩略图裁切留空间。
+- TikTok Shop US 的 1:1 是常规商品图建议；3:4 至 4:3 只属于官方 Excel/批量上传路径的条件规则，不能外推为所有入口的通用合同。
+- 拼多多公开通则写“主图背景以纯白为主”，这不等同于 Amazon 的严格 RGB 255 像素合同。
 
 ## Codex 图像生成
 
@@ -67,7 +102,7 @@
 
 生成交付还必须逐次记录实际提示词、参考输入、原始结果及其 SHA256，并由具名复核者完成身份、事实、平台、文字与构图检查。`brief.json`、`content_plan.md`、`qa_report.json` 和 `contact_sheet.jpg` 都必须在 manifest 中有可校验的证据记录；总体和每张计划图片全部通过才算完整。
 
-Amazon `main_white` 另有机器复核：QA 必须保存结构化 `platform_evidence`，验证器使用 Pillow 读取最终图，重算最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例与主体高度占比。人工填写 `platform: "pass"` 不能替代像素证据。
+Amazon `main_white` 另有机器复核：QA 必须保存结构化 `platform_evidence`，验证器使用 Pillow 读取最终图，重算 500–10,000 px 最长边、四角 10% 严格 RGB 255 比例、整图严格白色比例、前景面积与抗细线主体最长轴占比。这个像素检查是保守型 QA 代理，不替代平台和类目人工审核；人工填写 `platform: "pass"` 也不能替代像素证据。逼真的 AI 生成人物 XMP 元数据目前仍是发布前人工检查项。
 
 ## 安装到 Codex
 
@@ -114,21 +149,28 @@ $planning-ecommerce-image-sets
     │   ├── delivery-record-contract.md
     │   ├── planning-contract.md
     │   ├── platform-language-rules.md
+    │   ├── platform-requirements.json
     │   ├── prompt-generation-routing.md
     │   └── qa-and-recovery.md
     └── scripts/
         ├── validate_delivery.py
+        ├── validate_platform_rules.py
         └── validate_plan.py
 ```
 
 ## 本地验证
 
 ```powershell
+python .\planning-ecommerce-image-sets\scripts\validate_platform_rules.py .\planning-ecommerce-image-sets\references\platform-requirements.json
 python .\planning-ecommerce-image-sets\scripts\validate_plan.py <plan.json>
 python .\planning-ecommerce-image-sets\scripts\validate_delivery.py <run-dir>
 ```
 
-只有两条命令都以退出码 0 完成，才能把该目录作为已验证交付。
+只有对应模式所需的命令都以退出码 0 完成，才能把该目录作为已验证交付。
+
+### 计划合同升级
+
+本版本把计划 schema 升级为 `3.0`。旧 `2.0` 计划必须补齐平台画像、验证状态、与硬规则一一对应的 `hard_rule_ids`、来源和发布前复核字段后再运行 `validate_plan.py`；验证器会明确拒绝未迁移的旧合同，避免它们绕过新的平台规则检查。
 
 ## 使用边界
 

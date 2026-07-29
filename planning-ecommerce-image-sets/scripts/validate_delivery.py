@@ -23,11 +23,15 @@ SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 PASS_VERDICTS = {"pass", "passed"}
 TIMING_TOLERANCE_MS = 1
 RATIO_TOLERANCE = 1e-6
-AMAZON_MAIN_MIN_LONGEST_SIDE_PX = 1000
+AMAZON_MAIN_MIN_LONGEST_SIDE_PX = 500
+AMAZON_MAIN_MAX_LONGEST_SIDE_PX = 10000
 AMAZON_MAIN_CORNER_SAMPLE_RATIO = 0.1
 AMAZON_MAIN_MIN_CORNER_STRICT_WHITE_RATIO = 0.99
-AMAZON_MAIN_MIN_PRODUCT_FILL_HEIGHT_RATIO = 0.85
+AMAZON_MAIN_MIN_PRODUCT_FILL_LONGEST_AXIS_RATIO = 0.85
+AMAZON_MAIN_MIN_FOREGROUND_AREA_RATIO = 0.02
 AMAZON_MAIN_FOREGROUND_THRESHOLD = 245
+AMAZON_MAIN_PROXY_MAX_DIMENSION = 256
+AMAZON_MAIN_PROXY_OCCUPANCY_THRESHOLD = 128
 REQUIRED_QA_CHECKS = {"identity", "facts", "platform", "text", "composition"}
 ALLOWED_QA_CHECK_RESULTS = {"pass", "not_applicable"}
 ALLOWED_ATTEMPT_STATUSES = {"success", "failed"}
@@ -222,18 +226,43 @@ def inspect_amazon_main_white(path, label, errors):
             strict_white.crop(box).histogram()[255] / corner_pixels
         )
 
-    foreground_bbox = foreground.getbbox()
-    product_fill_height_ratio = (
-        0.0
-        if foreground_bbox is None
-        else (foreground_bbox[3] - foreground_bbox[1]) / height
+    foreground_pixels = foreground.histogram()[255]
+    foreground_area_ratio = foreground_pixels / total_pixels
+
+    proxy_scale = min(
+        1.0,
+        AMAZON_MAIN_PROXY_MAX_DIMENSION / max(width, height),
     )
+    proxy_size = (
+        max(1, round(width * proxy_scale)),
+        max(1, round(height * proxy_scale)),
+    )
+    resampling = getattr(Image, "Resampling", Image)
+    foreground_proxy = foreground.resize(proxy_size, resampling.BOX)
+    robust_foreground = foreground_proxy.point(
+        lambda value: (
+            255
+            if value >= AMAZON_MAIN_PROXY_OCCUPANCY_THRESHOLD
+            else 0
+        )
+    )
+    foreground_bbox = robust_foreground.getbbox()
+    if foreground_bbox is None:
+        product_fill_longest_axis_ratio = 0.0
+    else:
+        foreground_width = foreground_bbox[2] - foreground_bbox[0]
+        foreground_height = foreground_bbox[3] - foreground_bbox[1]
+        product_fill_longest_axis_ratio = max(
+            foreground_width / proxy_size[0],
+            foreground_height / proxy_size[1],
+        )
     return {
         "longest_side_px": max(width, height),
         "corner_sample_ratio": AMAZON_MAIN_CORNER_SAMPLE_RATIO,
         "corner_strict_white_ratio": min(corner_ratios),
         "overall_strict_white_ratio": overall_strict_white_ratio,
-        "product_fill_height_ratio": product_fill_height_ratio,
+        "product_fill_longest_axis_ratio": product_fill_longest_axis_ratio,
+        "foreground_area_ratio": foreground_area_ratio,
     }
 
 
@@ -258,7 +287,8 @@ def validate_amazon_main_white_evidence(path, qa_shot, label, errors):
         "corner_sample_ratio",
         "corner_strict_white_ratio",
         "overall_strict_white_ratio",
-        "product_fill_height_ratio",
+        "product_fill_longest_axis_ratio",
+        "foreground_area_ratio",
     )
     recorded_ratios = {
         field: finite_number(
@@ -274,6 +304,11 @@ def validate_amazon_main_white_evidence(path, qa_shot, label, errors):
         errors.append(
             f"{label} Amazon main_white longest side must be at least "
             f"{AMAZON_MAIN_MIN_LONGEST_SIDE_PX} px; got {actual_longest_side}"
+        )
+    if actual_longest_side > AMAZON_MAIN_MAX_LONGEST_SIDE_PX:
+        errors.append(
+            f"{label} Amazon main_white longest side must be at most "
+            f"{AMAZON_MAIN_MAX_LONGEST_SIDE_PX} px; got {actual_longest_side}"
         )
     if longest_side is not None and longest_side != actual_longest_side:
         errors.append(
@@ -309,12 +344,20 @@ def validate_amazon_main_white_evidence(path, qa_shot, label, errors):
             f"{AMAZON_MAIN_MIN_CORNER_STRICT_WHITE_RATIO}"
         )
 
-    fill_ratio = actual["product_fill_height_ratio"]
-    if not AMAZON_MAIN_MIN_PRODUCT_FILL_HEIGHT_RATIO <= fill_ratio <= 1.0:
+    fill_ratio = actual["product_fill_longest_axis_ratio"]
+    if not AMAZON_MAIN_MIN_PRODUCT_FILL_LONGEST_AXIS_RATIO <= fill_ratio <= 1.0:
         errors.append(
-            f"{label} Amazon main_white product_fill_height_ratio "
+            f"{label} Amazon main_white product_fill_longest_axis_ratio "
             f"{fill_ratio:.6f} must be between "
-            f"{AMAZON_MAIN_MIN_PRODUCT_FILL_HEIGHT_RATIO} and 1.0"
+            f"{AMAZON_MAIN_MIN_PRODUCT_FILL_LONGEST_AXIS_RATIO} and 1.0"
+        )
+    foreground_area_ratio = actual["foreground_area_ratio"]
+    if foreground_area_ratio < AMAZON_MAIN_MIN_FOREGROUND_AREA_RATIO:
+        errors.append(
+            f"{label} Amazon main_white foreground_area_ratio "
+            f"{foreground_area_ratio:.6f} must be at least "
+            f"{AMAZON_MAIN_MIN_FOREGROUND_AREA_RATIO}; this conservative proxy "
+            "rejects line-only or extremely sparse foregrounds"
         )
 
 
